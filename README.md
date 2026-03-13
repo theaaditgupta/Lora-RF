@@ -43,7 +43,6 @@ sx1276_regs.h    ← Full LoRa register map (addresses, bitmasks, mode values)
 | SF12, BW=125 kHz | ~800 m | ~1,483 ms | Best range, use for infrequent TX |
 | SF7,  BW=125 kHz | ~200 m |    ~69 ms | Shortest airtime, use for high rate |
 
-Measured in suburban Vancouver, line-of-sight, RFM95W modules at +14 dBm.
 
 ---
 
@@ -72,23 +71,7 @@ For a fault detection sensor transmitting once per minute:
 | SF7  | 69 ms  | ~540 µA | ~6.3 years |
 | SF12 | 1483 ms | ~1,100 µA | ~3.1 years |
 
-SF12 costs more battery but provides ~4x more range and ~10 dB more noise immunity. For a pole-mounted transformer sensor in a rural area, the range benefit outweighs the power cost.
-
----
-
-## Getting started
-
-```bash
-git clone https://github.com/aadit-gupta/lora-rf-link
-cd lora-rf-link
-
-# Build and run simulation
-make run
-
-# Run link budget analysis
-make budget
-```
-
+SF12 costs more battery but provides ~4x more range and ~10 dB more noise immunity. 
 ---
 
 ## File structure
@@ -111,13 +94,4 @@ lora-rf-link/
 
 ---
 
-## On real hardware
 
-The simulation build replaces SPI with a local register array. To run on real hardware:
-
-1. Implement `spi_transfer(uint8_t *tx, uint8_t *rx, uint8_t len)` for your MCU
-2. Replace `sx1276_read_reg` / `sx1276_write_reg` with SPI transactions:
-   - Write: pull NSS low, send `addr | 0x80`, send value, pull NSS high
-   - Read: pull NSS low, send `addr & 0x7F`, read byte, pull NSS high
-3. Wire DIO0 to a GPIO interrupt for TX_DONE and RX_DONE events
-4. Replace the blocking IRQ poll in `sx1276_send` / `sx1276_receive` with interrupt-driven callbacks
